@@ -1,0 +1,53 @@
+<div class="container-fluid" ng-controller="NetworkController">
+    <div ng-show="compactView">
+    <div class="siteType" ng-controller="SiteTypeController as typeCtrl" ng-show="type.count" ng-repeat="(typeKey, type) in siteTypes">
+        <div class="panel panel-primary animated">
+            <div class="panel-heading" ng-click="typeCtrl.toggleHidden()">{{type.name}} ({{type.count}})</div>
+        </div>
+        <div ng-hide="typeCtrl.hidden">
+            <div class="site" ng-repeat="site in sites | filter:{ type: typeKey}" ng-controller="SiteController as siteCtrl">
+                <div class="panel panel-info">
+                    <div class="panel-heading" ng-click="siteCtrl.toggleHidden(site.id)">{{site.name}} ({{site.buttons.length}})</div>
+                </div>
+                <div ng-hide="siteCtrl.isHidden(site.id)">
+                    <div class="row">
+                        <div ng-repeat="button in site.buttons" class="{{$index === 0 ? 'col-xs-12 col-sm-12 col-md-12' : 'col-xs-6 col-sm-6 col-md-6'}}">
+                                                    <button ng-hide="siteCtrl.showConfirmation" class="btn eventButton btn-block {{colorToClass[button.color]}}" ng-class="{'btn-sm': compactView}" ng-click="siteCtrl.confirmEvent(site, button)">{{button.name}} <div ng-hide="button.icon" class="ico"></div> <i ng-show="button.icon" class="animated ico ico-white ico-{{button.icon}}"></i></button></div></div>
+                    <div class="panel panel-default" ng-show="siteCtrl.showConfirmation" class="animted zoomIn">
+                        <div class="panel-body animated zoomIn">
+                            <div class="alert alert-warning animated bounceInUp" style="display:none"><strong><i class="fa fa-spin fa-cog"></i> There seems to be a delay. Please wait while we try to send your event.</strong></div>
+                            <p>Are you sure you want to create the event <b>{{siteCtrl.fireButton.name}}</b> for this site?</p>
+                            <div class="text-right">
+                                <button class="btn btn-primary btn-sm" ng-click="siteCtrl.fireEvent($event.target)"><i class="fa fa-check"></i> Yes, I'm sure.</button>
+                                <button class="btn btn-danger btn-sm" ng-click="siteCtrl.noConfirmation()"><i class="fa fa-times"></i> No, go back.</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	</div>
+    <div ng-hide="compactView">
+        <div class="site" ng-repeat="site in sites" ng-controller="SiteController as siteCtrl">
+            <h3>{{site.name}}</h3>
+            <div>
+                <div class="row">
+                    <div ng-repeat="button in site.buttons" class="{{$index === 0 ? 'col-xs-12 col-sm-12 col-md-12 mainButton' : 'col-xs-6 col-sm-6 col-md-6'}}">
+                        <button ng-hide="siteCtrl.showConfirmation" class="btn eventButton btn-block {{colorToClass[button.color]}}" ng-class="{'btn-sm': compactView}" ng-click="siteCtrl.confirmEvent(site, button)">{{button.name}} <i class="ico ico-white ico-{{button.icon}}"></i></button>
+                    </div>
+                </div>
+                <div class="panel panel-default" ng-show="siteCtrl.showConfirmation">
+                    <div class="panel-body">
+                        <div class="alert alert-warning" style="display:none"><strong><i class="fa fa-cog"></i> There seems to be a delay. Please wait while we try to send your event.</strong></div>
+                        <p>Are you sure you want to create the event <b>{{siteCtrl.fireButton.name}}</b> for this site?</p>
+                        <div class="text-right">
+                            <button class="btn btn-primary btn-sm" ng-click="siteCtrl.fireEvent($event.target)"><i class="fa fa-check"></i> Yes, I'm sure.</button>
+                            <button class="btn btn-danger btn-sm" ng-click="siteCtrl.noConfirmation()"><i class="fa fa-times"></i> No, go back.</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

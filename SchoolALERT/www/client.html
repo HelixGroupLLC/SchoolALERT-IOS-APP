@@ -1,0 +1,175 @@
+<html ng-app="SchoolAlert">
+    <head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Loading ...</title>
+		<link href="css/sprites.css" rel="stylesheet" type="text/css"/>
+        <link rel="stylesheet" href="css/font-awesome.min.css" />
+        <link rel="stylesheet" href="css/jquery.mmenu.all.css" />
+        <link rel="stylesheet" href="css/jquery.jgrowl.min.css" />
+        <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+        <!-- <link href="css/animate.min.css" rel="stylesheet" type="text/css"/> -->
+        <link rel="stylesheet" type="text/css" href="css/bootstrap-combobox.css">
+		<link href="css/style.css" rel="stylesheet" type="text/css"/>
+        <script type="text/javascript" src="js/jquery-1.11.0.min.js"></script>
+        <script type="text/javascript" src="js/angular.min.js"></script>
+        <script type="text/javascript" src="js/angular-sanitize.min.js"></script>
+		<script type="text/javascript" src="js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="js/jquery.mmenu.min.all.js"></script>
+		<script type="text/javascript" src="js/jquery.jgrowl.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap-combobox.js"></script>
+        <script type="text/javascript" src="js/buzz.min.js"></script>
+        <script src="js/socket.io.js"></script>
+        <script src="js/jquery.shuffle.modernizr.js" type="text/javascript"></script>
+		<script type="text/javascript" src="js/schoolalert.js"></script>
+        <!-- <script type='text/javascript' src='http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js'></script>-->
+	</head>
+	<body>
+		<nav id="slideout-menu">
+			<ul>
+				<li ng-class="{'mm-selected': currentPage === name}" ng-repeat="page in pages | objectToArray | orderBy:'pos'">
+					<a ng-click="changePageByPos(page.pos)" href="#"><i class="fa {{page.icon.menu}}"></i> <span ng-bind-html="page.text"></span></a>
+				</li>
+			</ul>
+		</nav>
+		<div id="app">
+			<div class="navbar navbar-default navbar-fixed-top mm-fixed-top" role="navigation">
+      			<div class="container-fluid">
+        			<div class="navbar-header">
+          				<a class="navbar-brand animated " ng-click="showSlideMenu()"><i class="fa fa-bars fa-2x"></i></a>
+          				<a id="currentPage" class="navbar-brand title"><i class="fa {{pages[currentPage].icon.page}}"></i> <span ng-bind-html="pages[currentPage].text"></span></a>
+        			</div>
+      			</div>
+    		</div>
+        	<div id="content">
+            <div class="container-fluid">
+                <div class="row" id="statuses">
+                    <!--<div class="col-md-4 col-sm-4 col-xs-4 bg-info" ng-show="userName"><i class="fa fa-user"></i> Logged in as {{userName}}</div>-->
+                    <div class="col-md-4 col-sm-4 col-xs-4 bg-danger" ng-show="checkins.length" id="checkinsStatus" ng-click="changePage('checkins')"><i class="fa fa-bullhorn"></i> <span>{{checkins.length}} checkin{{checkins.length === 1 ? '' : 's'}}</span></div>
+                    <div class="col-md-4 col-sm-4 col-xs-4 bg-primary" ng-show="notifications.length" ng-click="changePage('notifications')" id="notificationsStatus"><i class="fa fa-comments"></i> <span>{{notifications.length}} notification{{notifications.length === 1 ? '' : 's'}}</span></div>
+                </div>
+                <!--
+                <ul id="statuses">
+                  <li ng-show="userName" class=""><a href="#"><span class="status label label-info"></a></li>
+                  <li ng-show="checkins.length" id="checkinsStatus" class="" ng-click="changePage('checkins')"><a href="#"><span class=" status label label-danger"></span></a></li>
+                  <li ng-show="notifications.length" id="notificationsStatus" class="" ng-click="changePage('notifications')"><a href="#"><span class=" status label label-primary"><i class="fa fa-comments"></i> <span>{{notifications.length}} notification{{notifications.length === 1 ? '' : 's'}}</span></span></a></li>
+                </ul>
+                -->
+                <div id="networkPage" class="row nginclude" ng-show="currentPage === 'network'" ng-include="'network.html'"></div>
+                <div id="settingsPage" class="row nginclude" ng-show="currentPage === 'settings'" ng-include="'settings.html'"></div>
+            </div>
+        	</div>
+	    </div>
+        <div class="modal" id="setupModal" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="setupLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true"></span></button>
+                <h4 class="modal-title" id="setupLabel"><i class="fa fa-cog"></i> Setup</h4>
+              </div>
+              <form name="setupForm" ng-submit="setupCtrl.submit(this)" ng-controller="SetupController as setupCtrl">
+                  <div class="modal-body">
+                    <p>It seems like this is your first time running School ALERT. To complete the setup, please supply a valid device code and network URL below.</p>
+                        <div class="form-group">
+                            <label for="authUrl">Network URL</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="fa fa-globe"></i></div>
+                                <input ng-model="url" class="form-control" type="text" placeholder="sub.example.com">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="authUrl">Device Code</label>
+                            <div class="input-group">
+                                <div class="input-group-addon"><i class="fa fa-key"></i></div>
+                                <input ng-model="code" class="form-control" type="text">
+                            </div>
+                        </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" ng-click="completeSetup()" ng-disabled="!url || !code" disabled="disabled">Save</button>
+                  </div>
+              </form>
+            </div>
+          </div>
+        </div>
+    <div class="modal" id="checkinsModal" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="checkinsLabel" aria-hidden="true" ng-controller="CheckinsController">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" ng-show="checkins.length > 0"><b>{{activeIndex + 1}} of {{checkins.length}} checkins.<br/>{{checkins[activeIndex].time}}</b> - <u>{{ checkins[activeIndex].ofEvent + '@' + checkins[activeIndex].ofSite }}</u><br/>{{ checkins[activeIndex].message }}</h4>
+          </div>
+          <form name="form">
+            <div class="modal-body" ng-show="checkins.length > 0">
+              <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <div class="form-group">
+                    <label for="status"></label>
+                    <div class="btn-group" data-toggle="buttons">
+                      <label class="btn btn-success" ng-click="status = 'safe'"><input type="radio" style="margin-left: 10px">  Safe</label>
+                      <label class="btn btn-warning" ng-click="status = 'mild-risk'"><input type="radio" style="margin-left: 10px"> Mild-Risk </label>
+                      <label class="btn btn-danger" ng-click="status = 'danger'"><input type="radio"> Danger </label>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <select ng-model="location" class="combobox form-control">
+                      <option></option>
+                      <option ng-repeat="location in locations">{{location}}</option>
+                    </select>
+                  </div>
+                <div class="form-group">
+                  <textarea ng-model="message" name="message" class="form-control" rows="5" placeholder="Response ..."></textarea>
+                </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-body" ng-hide="checkins.length > 0">
+              <p>You don't have any checkins to respond to.</p>
+            </div>
+            <div class="modal-footer">
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-12 text-center" ng-show="checkins.length > 0">
+                  <button type="button" class="btn btn-default" ng-click="showCheckin(activeIndex - 1)" ng-disabled="activeIndex === 0"><i class="fa fa-arrow-left"></i></button>
+                  <button type="button" class="btn btn-{{statusToClass[status]}} animated bounceInUp" ng-click="sendResponse($event.target)"><i class="fa fa-comments"></i> Send Response</button>
+                  <button type="button" class="btn btn-default" ng-click="showCheckin(activeIndex + 1)" ng-disabled="activeIndex === checkins.length - 1"><i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" data-dismiss="modal" ng-hide="checkins.length > 0">Close</button>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="modal" id="notificationsModal" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="checkinsLabel" aria-hidden="true" ng-controller="NotificationsController">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            <h4 class="modal-title" ng-show="notifications.length"><b>{{notifications.length}} notifications</b></h4>
+            <h4 class="modal-title" ng-hide="notifications.length"><b>Notifications</b></h4>
+          </div>
+          <form name="form">
+            <div class="modal-body">
+              <div class="row" ng-show="notifications.length">
+                <div class="col-md-12 col-sm-12 col-xs-12" style="height: 300px !important;overflow: scroll;overflow-x: hidden;">
+                  <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12" ng-repeat="notification in notifications">
+                      <div class="alert alert-danger">
+                        <button ng-click="delete($event.target, $index)" type="button" class="close"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button><i class="fa fa-spinner fa-spin" style="display:none"></i>
+                        <strong>{{notification.time}}</strong><br/><span ng-bind-html="notification.message"></span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p ng-hide="notifications.length">You don't have any notifications.</p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-danger" ng-show="false && notifications.length" ng-disabled="!notifications[selectedIndex]" ng-click="deleteSelected()"><i class="fa fa-trash-o"></i> Delete Selected</button>
+              <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+	</body>
+</html>

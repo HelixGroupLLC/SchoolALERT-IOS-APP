@@ -1,0 +1,52 @@
+.ico {
+  background-image: url(../img/ico-events.png);
+  background-repeat: no-repeat;
+  display: block;
+  width: 32px;
+  height: 32px;
+}
+.ico-white {
+  background-image: url(../img/ico-events-white.png);
+}
+.ico-badge {
+  background-position: -5px -5px;
+}
+.ico-exclamation {
+  background-position: -47px -5px;
+}
+.ico-circle {
+  background-position: -89px -5px;
+}
+.ico-triangle {
+  background-position: -5px -47px;
+}
+.ico-fire {
+  background-position: -47px -47px;
+}
+.ico-gear {
+  background-position: -89px -47px;
+}
+.ico-light {
+  background-position: -5px -89px;
+}
+.ico-marker {
+  background-position: -47px -89px;
+}
+.ico-medical {
+  background-position: -89px -89px;
+}
+.ico-medical-bag {
+  background-position: -131px -5px;
+}
+.ico-megaphone {
+  background-position: -131px -47px;
+}
+.ico-plus {
+  background-position: -131px -89px;
+}
+.ico-star {
+  background-position: -5px -131px;
+}
+.ico-volume {
+  background-position: -47px -131px;
+}
